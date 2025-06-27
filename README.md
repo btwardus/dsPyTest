@@ -74,12 +74,11 @@ python main.py
 
 BootstrapFewShot is a great starting point. For potentially better performance, you can explore `dspy.teleprompt.BootstrapFewShotWithRandomSearch`. This optimizer not only finds the best examples but also searches for the best instructions and prompt formats. It requires more computational effort but can yield superior results.
 
-## Model Performance (gpt-4.1)
+## Results Overview
 
-When using the `gpt-4.1` model, the following classification report was achieved on the full validation set:
+# Example Results: `gpt-4.1` 439 validation cases
 
 ```
-Classification Report:
               precision    recall  f1-score   support
 
          Yes       1.00      0.98      0.99       197
@@ -91,6 +90,19 @@ weighted avg       0.99      0.99      0.99       439
 ```
 
 This demonstrates high accuracy and balanced performance for both classes.
+
+# Example Results: `gemma:2b` (Ollama, 50 validation cases)
+
+```
+             precision    recall  f1-score   support
+
+         Yes       0.57      0.18      0.28        22
+          No       0.00      0.00      0.00        28
+
+   micro avg       0.57      0.08      0.14        50
+   macro avg       0.29      0.09      0.14        50
+weighted avg       0.25      0.08      0.12        50
+```
 
 ## References
 - [Abt-Buy Dataset and Benchmark](https://dbs.uni-leipzig.de/research/projects/benchmark-datasets-for-entity-resolution#:~:text=Used%20in-,Abt%2DBuy,-E%2Dcommerce)

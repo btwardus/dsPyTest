@@ -14,7 +14,7 @@ from dspy.teleprompt import BootstrapFewShot
 # =====================
 # Configuration Constants
 # =====================
-USE_OLLAMA = False  # Set to False to use OpenAI instead
+USE_OLLAMA = True  # Set to True to use Ollama instead of OpenAI
 OLLAMA_MODEL_NAME = 'gemma:2b'  # Name of the Ollama model to use
 OPENAI_MODEL_NAME = 'gpt-4.1'  # Name of the openai model to use
 SYSTEM_PROMPT = (
