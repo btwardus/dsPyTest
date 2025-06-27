@@ -14,14 +14,15 @@ from dspy.teleprompt import BootstrapFewShot
 # =====================
 # Configuration Constants
 # =====================
+USE_OLLAMA = True  # Set to False to use OpenAI instead
 MODEL_NAME = 'gpt-4.1'  # Name of the language model to use
 SYSTEM_PROMPT = (
     "You are an entity resolution assistant. For each product pair, output only 'Yes' or 'No' as the label, and nothing else. "
     "The label must be the first line of your response. If you are uncertain, prefer 'Yes'."
 )  # System prompt for the language model
-TRAIN_FILE_PATH = 'data/train_products.csv'  # Path to the training CSV file
+TRAIN_FILE_PATH = 'data/train_products_tailored.csv'  # Path to the training CSV file
 VALIDATION_FILE_PATH = 'data/val_products.csv'  # Path to the validation CSV file
-VALIDATION_SAMPLE_SIZE = 200  # Number of validation examples to sample
+VALIDATION_SAMPLE_SIZE = 10  # Number of validation examples to sample
 MAX_WORKERS = 5  # Number of threads for parallel evaluation
 MAX_BOOTSTRAPPED_DEMOS = 2  # Number of bootstrapped demos for BootstrapFewShot
 # =====================
@@ -101,11 +102,23 @@ def main():
 
     # Configure the language model
     openai_api_key = os.getenv("OPENAI_API_KEY")
-    if not openai_api_key:
-        raise ValueError("OPENAI_API_KEY not found in .env file")
-    
+    if not openai_api_key and not USE_OLLAMA:
+        raise ValueError("OPENAI_API_KEY not found in .env file and USE_OLLAMA is False")
+
+    ollama_lm = dspy.OllamaLocal(
+        model="gemma:2b",
+        base_url="http://localhost:11434",
+        max_tokens=512,
+        timeout_s=120
+    )
     turbo = dspy.OpenAI(model=MODEL_NAME, api_key=openai_api_key, system_prompt=SYSTEM_PROMPT)
-    dspy.settings.configure(lm=turbo)
+
+    if USE_OLLAMA:
+        dspy.settings.configure(lm=ollama_lm)
+        print("Using Ollama model: gemma:2b")
+    else:
+        dspy.settings.configure(lm=turbo)
+        print(f"Using OpenAI model: {MODEL_NAME}")
 
     # Use all training data for compilation
     train_data = load_train_data(TRAIN_FILE_PATH)
@@ -124,7 +137,10 @@ def main():
         print(f"Error: Validation file {VALIDATION_FILE_PATH} is empty.")
         sys.exit(1)
     val_df = val_df.reset_index(drop=True)
-    print(f"Using all {len(val_df)} validation examples.")
+    # Sample validation data if more than VALIDATION_SAMPLE_SIZE
+    if len(val_df) > VALIDATION_SAMPLE_SIZE:
+        val_df = val_df.sample(n=VALIDATION_SAMPLE_SIZE, random_state=42).reset_index(drop=True)
+    print(f"Using {len(val_df)} validation examples.")
 
     # Try different teleprompters
     teleprompters = [
