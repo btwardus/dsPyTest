@@ -76,6 +76,10 @@ See [`data/validation_results_bootstrapfewshot_2025-06-26.md`](data/validation_r
 - **Validation Size:** Adjust the sample size or use the full validation set as needed.
 - **Teleprompters:** Try other DSPy teleprompters (see `main.py` for examples).
 
+## Advanced Teleprompter Optimization
+
+BootstrapFewShot is a great starting point. For potentially better performance, you can explore `dspy.teleprompt.BootstrapFewShotWithRandomSearch`. This optimizer not only finds the best examples but also searches for the best instructions and prompt formats. It requires more computational effort but can yield superior results.
+
 ## Model Performance (gpt-4.1)
 
 When using the `gpt-4.1` model, the following classification report was achieved on the full validation set:

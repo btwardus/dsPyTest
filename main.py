@@ -24,7 +24,7 @@ SYSTEM_PROMPT = (
 )  # System prompt for the language model
 TRAIN_FILE_PATH = 'data/train_products_tailored.csv'  # Path to the training CSV file
 VALIDATION_FILE_PATH = 'data/val_products.csv'  # Path to the validation CSV file
-VALIDATION_SAMPLE_SIZE = 200  # Number of validation examples to sample
+VALIDATION_SAMPLE_SIZE = 50  # Number of validation examples to sample
 MAX_WORKERS = 12  # Number of threads for parallel evaluation
 MAX_BOOTSTRAPPED_DEMOS = 2  # Number of bootstrapped demos for BootstrapFewShot
 # =====================
@@ -64,9 +64,10 @@ def evaluate_teleprompter(teleprompter, teleprompter_name, train_subset, val_df,
         result = compiled_program(product1=product1, product2=product2)
         raw_label = str(result.label)
         explanation = result.explanation
+        confidence = getattr(result, 'confidence', None)
         pred = extract_label(raw_label)
         actual = str(row['label']).strip().capitalize()
-        return idx, actual, pred, raw_label, explanation, product1, product2
+        return idx, actual, pred, raw_label, explanation, confidence, product1, product2
 
     y_true, y_pred = [], []
     disagreements = []
@@ -74,12 +75,12 @@ def evaluate_teleprompter(teleprompter, teleprompter_name, train_subset, val_df,
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         futures = {executor.submit(predict_label, idx, row): idx for idx, row in val_df.iterrows()}
         for i, future in enumerate(as_completed(futures), 1):
-            idx, actual, pred, raw_label, explanation, product1, product2 = future.result()
+            idx, actual, pred, raw_label, explanation, confidence, product1, product2 = future.result()
             y_true.append(actual)
             y_pred.append(pred)
-            print(f"Example {i}: True={actual} | Pred={pred}")
+            print(f"Example {i}: True={actual} | Pred={pred} | Confidence={confidence if confidence is not None else '[No confidence]'}")
             if pred != actual:
-                disagreements.append((i, actual, pred, raw_label, explanation, product1, product2, val_df.loc[idx].to_dict()))
+                disagreements.append((i, actual, pred, raw_label, explanation, confidence, product1, product2, val_df.loc[idx].to_dict()))
 
     print("\nConfusion Matrix:")
     print(confusion_matrix(y_true, y_pred, labels=["Yes", "No"]))
@@ -88,12 +89,13 @@ def evaluate_teleprompter(teleprompter, teleprompter_name, train_subset, val_df,
 
     if disagreements:
         print("\n--- Disagreement Details ---")
-        for idx, actual, pred, raw_label, explanation, product1, product2, row_dict in disagreements:
+        for idx, actual, pred, raw_label, explanation, confidence, product1, product2, row_dict in disagreements:
             print(f"\nExample {idx}:")
             print(f"  True Label: {actual}")
             print(f"  Predicted Label: {pred}")
             print(f"  Raw Output: {raw_label}")
             print(f"  Model's Explanation: {explanation if explanation else '[No explanation provided]'}")
+            print(f"  Confidence: {confidence if confidence is not None else '[No confidence]'}")
             print(f"  Product 1 (formatted): {product1}")
             print(f"  Product 2 (formatted): {product2}")
         print("--- End of Disagreements ---")

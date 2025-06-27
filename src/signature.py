@@ -10,4 +10,5 @@ class ProductResolutionSignature(dspy.Signature):
     
     # Add an explanation field for ChainOfThought
     explanation = dspy.OutputField(desc="A short, step-by-step explanation of the reasoning process.")
+    confidence = dspy.OutputField(desc="A number 0-100 indicating confidence the two products are the same.")
     label = dspy.OutputField(desc="Output ONLY 'Yes' or 'No' as the first line. Do NOT include explanations or extra text in the label line.") 
