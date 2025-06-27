@@ -15,9 +15,7 @@ __pycache__/
 local_cache/
 
 # Data files (generated or large)
-data/train_products.csv
-data/val_products.csv
-data/raw/
+data/*
 
 data/validation_results_*.md
 
