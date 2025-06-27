@@ -11,6 +11,20 @@ from src.module import ProductResolutionModule
 from src.data import train_data
 from dspy.teleprompt import BootstrapFewShot
 
+# =====================
+# Configuration Constants
+# =====================
+MODEL_NAME = 'gpt-4.1'  # Name of the language model to use
+SYSTEM_PROMPT = (
+    "You are an entity resolution assistant. For each product pair, output only 'Yes' or 'No' as the label, and nothing else. "
+    "The label must be the first line of your response. If you are uncertain, prefer 'Yes'."
+)  # System prompt for the language model
+VALIDATION_FILE_PATH = 'data/val_products.csv'  # Path to the validation CSV file
+VALIDATION_SAMPLE_SIZE = 200  # Number of validation examples to sample
+MAX_WORKERS = 5  # Number of threads for parallel evaluation
+MAX_BOOTSTRAPPED_DEMOS = 2  # Number of bootstrapped demos for BootstrapFewShot
+# =====================
+
 def extract_label(output):
     output = output.strip().splitlines()[0]  # Take the first line, strip whitespace
     if output.lower() in {"yes", "no"}:
@@ -34,7 +48,7 @@ def format_product(row, prefix):
 def simple_metric(example, prediction, trace=None):
     return getattr(example, "label", None) == getattr(prediction, "label", None)
 
-def evaluate_teleprompter(teleprompter, teleprompter_name, train_subset, val_df, max_workers=5):
+def evaluate_teleprompter(teleprompter, teleprompter_name, train_subset, val_df, max_workers=MAX_WORKERS):
     print(f"\n{'='*30}\nEvaluating {teleprompter_name}\n{'='*30}")
     product_resolution_module = ProductResolutionModule()
     compiled_program = teleprompter.compile(product_resolution_module, trainset=train_subset)
@@ -89,7 +103,7 @@ def main():
     if not openai_api_key:
         raise ValueError("OPENAI_API_KEY not found in .env file")
     
-    turbo = dspy.OpenAI(model='gpt-4.1', api_key=openai_api_key, system_prompt="You are an entity resolution assistant. For each product pair, output only 'Yes' or 'No' as the label, and nothing else. The label must be the first line of your response. If you are uncertain, prefer 'Yes'.")
+    turbo = dspy.OpenAI(model=MODEL_NAME, api_key=openai_api_key, system_prompt=SYSTEM_PROMPT)
     dspy.settings.configure(lm=turbo)
 
     # Use all training data for compilation
@@ -100,19 +114,18 @@ def main():
     print(f"Using {len(train_subset)} training examples.")
 
     # Load validation data from CSV
-    val_path = 'data/val_products.csv'
-    if not os.path.exists(val_path):
-        print(f"Error: Validation file {val_path} does not exist.")
+    if not os.path.exists(VALIDATION_FILE_PATH):
+        print(f"Error: Validation file {VALIDATION_FILE_PATH} does not exist.")
         sys.exit(1)
-    val_df = pd.read_csv(val_path)
+    val_df = pd.read_csv(VALIDATION_FILE_PATH)
     if len(val_df) == 0:
-        print(f"Error: Validation file {val_path} is empty.")
+        print(f"Error: Validation file {VALIDATION_FILE_PATH} is empty.")
         sys.exit(1)
-    val_df = val_df.sample(n=200, random_state=42).reset_index(drop=True)
+    val_df = val_df.sample(n=VALIDATION_SAMPLE_SIZE, random_state=42).reset_index(drop=True)
 
     # Try different teleprompters
     teleprompters = [
-        (BootstrapFewShot(metric=None, max_bootstrapped_demos=2), "BootstrapFewShot")
+        (BootstrapFewShot(metric=None, max_bootstrapped_demos=MAX_BOOTSTRAPPED_DEMOS), "BootstrapFewShot")
     ]
 
     for teleprompter, name in teleprompters:
