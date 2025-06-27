@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.pyc
+
+# Virtual environment
+.venv/
+
+# Environment variables
+.env
+
+# macOS
+.DS_Store
+
+# DSPy/Project cache
+local_cache/
+
+# Data files (generated or large)
+data/train_products.csv
+data/val_products.csv
+data/raw/
+
+data/validation_results_*.md
+
+groq_usage.log
+assertion.log
+*.log
+
+# Jupyter
+.ipynb_checkpoints/ 
