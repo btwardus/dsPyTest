@@ -23,7 +23,7 @@ SYSTEM_PROMPT = (
 )  # System prompt for the language model
 TRAIN_FILE_PATH = 'data/train_products_tailored.csv'  # Path to the training CSV file
 VALIDATION_FILE_PATH = 'data/val_products.csv'  # Path to the validation CSV file
-VALIDATION_SAMPLE_SIZE = 10  # Number of validation examples to sample
+VALIDATION_SAMPLE_SIZE = 100  # Number of validation examples to sample
 MAX_WORKERS = 5  # Number of threads for parallel evaluation
 MAX_BOOTSTRAPPED_DEMOS = 2  # Number of bootstrapped demos for BootstrapFewShot
 # =====================
@@ -143,9 +143,15 @@ def main():
         val_df = val_df.sample(n=VALIDATION_SAMPLE_SIZE, random_state=42).reset_index(drop=True)
     print(f"Using {len(val_df)} validation examples.")
 
+    # Your defined metric
+    def simple_metric(example, prediction, trace=None):
+        # We will improve this later, but for now, let's use the basic version
+        predicted_label = extract_label(prediction.label)
+        return example.label.lower() == predicted_label.lower()
+
     # Try different teleprompters
     teleprompters = [
-        (BootstrapFewShot(metric=None, max_bootstrapped_demos=MAX_BOOTSTRAPPED_DEMOS), "BootstrapFewShot")
+        (BootstrapFewShot(metric=simple_metric, max_bootstrapped_demos=MAX_BOOTSTRAPPED_DEMOS), "BootstrapFewShot")
     ]
 
     for teleprompter, name in teleprompters:
