@@ -18,13 +18,14 @@ USE_OLLAMA = False  # Set to False to use OpenAI instead
 OLLAMA_MODEL_NAME = 'gemma:2b'  # Name of the Ollama model to use
 OPENAI_MODEL_NAME = 'gpt-4.1'  # Name of the openai model to use
 SYSTEM_PROMPT = (
-    "You are an entity resolution assistant. For each product pair, output only 'Yes' or 'No' as the label, and nothing else. "
-    "The label must be the first line of your response. If you are uncertain, prefer 'Yes'."
+    "You are an entity resolution assistant. For each product pair, output only 'Yes' or 'No' as the label, and nothing else as the first line. "
+    "Then, provide a short, step-by-step explanation of your reasoning as the next field. "
+    "If you are uncertain, prefer 'Yes'."
 )  # System prompt for the language model
 TRAIN_FILE_PATH = 'data/train_products_tailored.csv'  # Path to the training CSV file
 VALIDATION_FILE_PATH = 'data/val_products.csv'  # Path to the validation CSV file
-VALIDATION_SAMPLE_SIZE = 100  # Number of validation examples to sample
-MAX_WORKERS = 5  # Number of threads for parallel evaluation
+VALIDATION_SAMPLE_SIZE = 200  # Number of validation examples to sample
+MAX_WORKERS = 12  # Number of threads for parallel evaluation
 MAX_BOOTSTRAPPED_DEMOS = 2  # Number of bootstrapped demos for BootstrapFewShot
 # =====================
 
@@ -62,9 +63,10 @@ def evaluate_teleprompter(teleprompter, teleprompter_name, train_subset, val_df,
         product2 = format_product(row, 'buy')
         result = compiled_program(product1=product1, product2=product2)
         raw_label = str(result.label)
+        explanation = result.explanation
         pred = extract_label(raw_label)
         actual = str(row['label']).strip().capitalize()
-        return idx, actual, pred, raw_label, product1, product2
+        return idx, actual, pred, raw_label, explanation, product1, product2
 
     y_true, y_pred = [], []
     disagreements = []
@@ -72,12 +74,12 @@ def evaluate_teleprompter(teleprompter, teleprompter_name, train_subset, val_df,
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         futures = {executor.submit(predict_label, idx, row): idx for idx, row in val_df.iterrows()}
         for i, future in enumerate(as_completed(futures), 1):
-            idx, actual, pred, raw_label, product1, product2 = future.result()
+            idx, actual, pred, raw_label, explanation, product1, product2 = future.result()
             y_true.append(actual)
             y_pred.append(pred)
             print(f"Example {i}: True={actual} | Pred={pred}")
             if pred != actual:
-                disagreements.append((i, actual, pred, raw_label, product1, product2, val_df.loc[idx].to_dict()))
+                disagreements.append((i, actual, pred, raw_label, explanation, product1, product2, val_df.loc[idx].to_dict()))
 
     print("\nConfusion Matrix:")
     print(confusion_matrix(y_true, y_pred, labels=["Yes", "No"]))
@@ -86,11 +88,12 @@ def evaluate_teleprompter(teleprompter, teleprompter_name, train_subset, val_df,
 
     if disagreements:
         print("\n--- Disagreement Details ---")
-        for idx, actual, pred, raw_label, product1, product2, row_dict in disagreements:
+        for idx, actual, pred, raw_label, explanation, product1, product2, row_dict in disagreements:
             print(f"\nExample {idx}:")
             print(f"  True Label: {actual}")
             print(f"  Predicted Label: {pred}")
             print(f"  Raw Output: {raw_label}")
+            print(f"  Model's Explanation: {explanation if explanation else '[No explanation provided]'}")
             print(f"  Product 1 (formatted): {product1}")
             print(f"  Product 2 (formatted): {product2}")
         print("--- End of Disagreements ---")
@@ -143,15 +146,16 @@ def main():
         val_df = val_df.sample(n=VALIDATION_SAMPLE_SIZE, random_state=42).reset_index(drop=True)
     print(f"Using {len(val_df)} validation examples.")
 
-    # Your defined metric
-    def simple_metric(example, prediction, trace=None):
-        # We will improve this later, but for now, let's use the basic version
+    # Metric function in main.py
+    def get_metric(example, prediction, trace=None):
+        # Use the same label extraction logic as in the evaluation loop
         predicted_label = extract_label(prediction.label)
-        return example.label.lower() == predicted_label.lower()
+        # Ensure comparison is case-insensitive
+        return example.label.strip().lower() == predicted_label.strip().lower()
 
     # Try different teleprompters
     teleprompters = [
-        (BootstrapFewShot(metric=simple_metric, max_bootstrapped_demos=MAX_BOOTSTRAPPED_DEMOS), "BootstrapFewShot")
+        (BootstrapFewShot(metric=get_metric, max_bootstrapped_demos=MAX_BOOTSTRAPPED_DEMOS), "BootstrapFewShot")
     ]
 
     for teleprompter, name in teleprompters:

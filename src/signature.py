@@ -8,4 +8,6 @@ class ProductResolutionSignature(dspy.Signature):
     product1 = dspy.InputField(desc="First product record with details.")
     product2 = dspy.InputField(desc="Second product record with details.")
     
+    # Add an explanation field for ChainOfThought
+    explanation = dspy.OutputField(desc="A short, step-by-step explanation of the reasoning process.")
     label = dspy.OutputField(desc="Output ONLY 'Yes' or 'No' as the first line. Do NOT include explanations or extra text in the label line.") 
