@@ -8,7 +8,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import sys
 
 from src.module import ProductResolutionModule
-from src.data import train_data
+from src.data import load_train_data
 from dspy.teleprompt import BootstrapFewShot
 
 # =====================
@@ -19,6 +19,7 @@ SYSTEM_PROMPT = (
     "You are an entity resolution assistant. For each product pair, output only 'Yes' or 'No' as the label, and nothing else. "
     "The label must be the first line of your response. If you are uncertain, prefer 'Yes'."
 )  # System prompt for the language model
+TRAIN_FILE_PATH = 'data/train_products.csv'  # Path to the training CSV file
 VALIDATION_FILE_PATH = 'data/val_products.csv'  # Path to the validation CSV file
 VALIDATION_SAMPLE_SIZE = 200  # Number of validation examples to sample
 MAX_WORKERS = 5  # Number of threads for parallel evaluation
@@ -107,6 +108,7 @@ def main():
     dspy.settings.configure(lm=turbo)
 
     # Use all training data for compilation
+    train_data = load_train_data(TRAIN_FILE_PATH)
     if not isinstance(train_data, list) or len(train_data) == 0:
         print("Error: train_data is empty or not a list. Please check your training data.")
         sys.exit(1)
