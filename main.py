@@ -14,8 +14,9 @@ from dspy.teleprompt import BootstrapFewShot
 # =====================
 # Configuration Constants
 # =====================
-USE_OLLAMA = True  # Set to False to use OpenAI instead
-MODEL_NAME = 'gpt-4.1'  # Name of the language model to use
+USE_OLLAMA = False  # Set to False to use OpenAI instead
+OLLAMA_MODEL_NAME = 'gemma:2b'  # Name of the Ollama model to use
+OPENAI_MODEL_NAME = 'gpt-4.1'  # Name of the openai model to use
 SYSTEM_PROMPT = (
     "You are an entity resolution assistant. For each product pair, output only 'Yes' or 'No' as the label, and nothing else. "
     "The label must be the first line of your response. If you are uncertain, prefer 'Yes'."
@@ -106,19 +107,19 @@ def main():
         raise ValueError("OPENAI_API_KEY not found in .env file and USE_OLLAMA is False")
 
     ollama_lm = dspy.OllamaLocal(
-        model="gemma:2b",
+        model=OLLAMA_MODEL_NAME,
         base_url="http://localhost:11434",
         max_tokens=512,
         timeout_s=120
     )
-    turbo = dspy.OpenAI(model=MODEL_NAME, api_key=openai_api_key, system_prompt=SYSTEM_PROMPT)
+    turbo = dspy.OpenAI(model=OPENAI_MODEL_NAME, api_key=openai_api_key, system_prompt=SYSTEM_PROMPT)
 
     if USE_OLLAMA:
         dspy.settings.configure(lm=ollama_lm)
-        print("Using Ollama model: gemma:2b")
+        print(f"Using Ollama model: {OLLAMA_MODEL_NAME}")
     else:
         dspy.settings.configure(lm=turbo)
-        print(f"Using OpenAI model: {MODEL_NAME}")
+        print(f"Using OpenAI model: {OPENAI_MODEL_NAME}")
 
     # Use all training data for compilation
     train_data = load_train_data(TRAIN_FILE_PATH)
