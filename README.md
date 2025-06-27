@@ -76,7 +76,7 @@ BootstrapFewShot is a great starting point. For potentially better performance, 
 
 ## Results Overview
 
-# Example Results: `gpt-4.1` 439 validation cases
+### Example Results: `gpt-4.1` 439 validation cases
 
 ```
               precision    recall  f1-score   support
@@ -91,7 +91,7 @@ weighted avg       0.99      0.99      0.99       439
 
 This demonstrates high accuracy and balanced performance for both classes.
 
-# Example Results: `gemma:2b` (Ollama, 50 validation cases)
+### Example Results: `gemma:2b` (Ollama, 50 validation cases)
 
 ```
              precision    recall  f1-score   support
