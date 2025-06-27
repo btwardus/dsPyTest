@@ -65,12 +65,6 @@ python main.py
   - Evaluate on a sample of the validation set
   - Print confusion matrix, classification report, and disagreement details
 
-## Example Results
-See [`data/validation_results_bootstrapfewshot_2025-06-26.md`](data/validation_results_bootstrapfewshot_2025-06-26.md) for a sample evaluation output:
-- **Accuracy:** 99% (on 200 validation examples)
-- **Model:** OpenAI GPT-4.1
-- **Prompt:** If you are uncertain, prefer 'Yes'.
-
 ## Customization
 - **Prompt/Model:** Edit `main.py` to change the system prompt, model, or number of few-shot demos.
 - **Validation Size:** Adjust the sample size or use the full validation set as needed.
