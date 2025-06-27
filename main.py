@@ -5,10 +5,11 @@ import pandas as pd
 from sklearn.metrics import confusion_matrix, classification_report
 import re
 from concurrent.futures import ThreadPoolExecutor, as_completed
+import sys
 
 from src.module import ProductResolutionModule
 from src.data import train_data
-from dspy.teleprompt import BootstrapFewShot, LabeledFewShot, BootstrapFewShotWithRandomSearch
+from dspy.teleprompt import BootstrapFewShot
 
 def extract_label(output):
     output = output.strip().splitlines()[0]  # Take the first line, strip whitespace
@@ -39,27 +40,27 @@ def evaluate_teleprompter(teleprompter, teleprompter_name, train_subset, val_df,
     compiled_program = teleprompter.compile(product_resolution_module, trainset=train_subset)
     print(f"Compilation complete for {teleprompter_name}.")
 
-    def predict_label(row):
+    def predict_label(idx, row):
         product1 = format_product(row, 'abt')
         product2 = format_product(row, 'buy')
         result = compiled_program(product1=product1, product2=product2)
         raw_label = str(result.label)
         pred = extract_label(raw_label)
         actual = str(row['label']).strip().capitalize()
-        return actual, pred, raw_label, product1, product2
+        return idx, actual, pred, raw_label, product1, product2
 
     y_true, y_pred = [], []
     disagreements = []
 
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
-        futures = [executor.submit(predict_label, row) for _, row in val_df.iterrows()]
-        for idx, (row_idx, future) in enumerate(zip(val_df.index, as_completed(futures)), 1):
-            actual, pred, raw_label, product1, product2 = future.result()
+        futures = {executor.submit(predict_label, idx, row): idx for idx, row in val_df.iterrows()}
+        for i, future in enumerate(as_completed(futures), 1):
+            idx, actual, pred, raw_label, product1, product2 = future.result()
             y_true.append(actual)
             y_pred.append(pred)
-            print(f"Example {idx}: True={actual} | Pred={pred}")
+            print(f"Example {i}: True={actual} | Pred={pred}")
             if pred != actual:
-                disagreements.append((idx, actual, pred, raw_label, product1, product2, val_df.loc[row_idx].to_dict()))
+                disagreements.append((i, actual, pred, raw_label, product1, product2, val_df.loc[idx].to_dict()))
 
     print("\nConfusion Matrix:")
     print(confusion_matrix(y_true, y_pred, labels=["Yes", "No"]))
@@ -92,11 +93,22 @@ def main():
     dspy.settings.configure(lm=turbo)
 
     # Use all training data for compilation
+    if not isinstance(train_data, list) or len(train_data) == 0:
+        print("Error: train_data is empty or not a list. Please check your training data.")
+        sys.exit(1)
     train_subset = train_data
     print(f"Using {len(train_subset)} training examples.")
 
     # Load validation data from CSV
-    val_df = pd.read_csv('data/val_products.csv').sample(n=200, random_state=42).reset_index(drop=True)
+    val_path = 'data/val_products.csv'
+    if not os.path.exists(val_path):
+        print(f"Error: Validation file {val_path} does not exist.")
+        sys.exit(1)
+    val_df = pd.read_csv(val_path)
+    if len(val_df) == 0:
+        print(f"Error: Validation file {val_path} is empty.")
+        sys.exit(1)
+    val_df = val_df.sample(n=200, random_state=42).reset_index(drop=True)
 
     # Try different teleprompters
     teleprompters = [

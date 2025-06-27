@@ -17,7 +17,6 @@ local_cache/
 # Data files (generated or large)
 data/*
 
-data/validation_results_*.md
 
 groq_usage.log
 assertion.log
