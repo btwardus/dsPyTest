@@ -76,6 +76,24 @@ See [`data/validation_results_bootstrapfewshot_2025-06-26.md`](data/validation_r
 - **Validation Size:** Adjust the sample size or use the full validation set as needed.
 - **Teleprompters:** Try other DSPy teleprompters (see `main.py` for examples).
 
+## Model Performance (gpt-4.1)
+
+When using the `gpt-4.1` model, the following classification report was achieved on the full validation set:
+
+```
+Classification Report:
+              precision    recall  f1-score   support
+
+         Yes       1.00      0.98      0.99       197
+          No       0.99      1.00      0.99       242
+
+    accuracy                           0.99       439
+   macro avg       0.99      0.99      0.99       439
+weighted avg       0.99      0.99      0.99       439
+```
+
+This demonstrates high accuracy and balanced performance for both classes.
+
 ## References
 - [Abt-Buy Dataset and Benchmark](https://dbs.uni-leipzig.de/research/projects/benchmark-datasets-for-entity-resolution#:~:text=Used%20in-,Abt%2DBuy,-E%2Dcommerce)
 - [DSPy: Modular LLM Pipelines](https://github.com/stanfordnlp/dspy)

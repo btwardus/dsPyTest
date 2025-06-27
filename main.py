@@ -123,7 +123,8 @@ def main():
     if len(val_df) == 0:
         print(f"Error: Validation file {VALIDATION_FILE_PATH} is empty.")
         sys.exit(1)
-    val_df = val_df.sample(n=VALIDATION_SAMPLE_SIZE, random_state=42).reset_index(drop=True)
+    val_df = val_df.reset_index(drop=True)
+    print(f"Using all {len(val_df)} validation examples.")
 
     # Try different teleprompters
     teleprompters = [
