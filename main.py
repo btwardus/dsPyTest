@@ -6,6 +6,7 @@ from sklearn.metrics import confusion_matrix, classification_report
 import re
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import sys
+import requests
 
 from src.module import ProductResolutionModule
 from src.data import load_train_data
@@ -14,9 +15,17 @@ from dspy.teleprompt import BootstrapFewShot
 # =====================
 # Configuration Constants
 # =====================
-USE_OLLAMA = True  # Set to True to use Ollama instead of OpenAI
-OLLAMA_MODEL_NAME = 'gemma:2b'  # Name of the Ollama model to use
+# Model Provider Selection: Set to one of "ollama", "openai", or "openrouter"
+MODEL_PROVIDER = "openrouter"  # Options: "ollama", "openai", "openrouter"
+
+# Ollama Configuration
+OLLAMA_MODEL_NAME = 'qwen3:14b'  # Name of the Ollama model to use
+
+# OpenAI Configuration  
 OPENAI_MODEL_NAME = 'gpt-4.1'  # Name of the openai model to use
+
+# OpenRouter Configuration
+OPENROUTER_MODEL_NAME = 'openai/gpt-oss-120b'  # Name of the OpenRouter model to use
 SYSTEM_PROMPT = (
     "You are an entity resolution assistant. For each product pair, output only 'Yes' or 'No' as the label, and nothing else as the first line. "
     "Then, provide a short, step-by-step explanation of your reasoning as the next field. "
@@ -24,9 +33,9 @@ SYSTEM_PROMPT = (
 )  # System prompt for the language model
 TRAIN_FILE_PATH = 'data/train_products_tailored.csv'  # Path to the training CSV file
 VALIDATION_FILE_PATH = 'data/val_products.csv'  # Path to the validation CSV file
-VALIDATION_SAMPLE_SIZE = 50  # Number of validation examples to sample
-MAX_WORKERS = 12  # Number of threads for parallel evaluation
-MAX_BOOTSTRAPPED_DEMOS = 2  # Number of bootstrapped demos for BootstrapFewShot
+VALIDATION_SAMPLE_SIZE = 10  # Number of validation examples to sample
+MAX_WORKERS = 2  # Number of threads for parallel evaluation
+MAX_BOOTSTRAPPED_DEMOS = 1  # Number of bootstrapped demos for BootstrapFewShot
 # =====================
 
 def extract_label(output):
@@ -106,25 +115,56 @@ def main():
     # Load environment variables from .env file
     load_dotenv()
 
-    # Configure the language model
-    openai_api_key = os.getenv("OPENAI_API_KEY")
-    if not openai_api_key and not USE_OLLAMA:
-        raise ValueError("OPENAI_API_KEY not found in .env file and USE_OLLAMA is False")
-
-    ollama_lm = dspy.OllamaLocal(
-        model=OLLAMA_MODEL_NAME,
-        base_url="http://localhost:11434",
-        max_tokens=512,
-        timeout_s=120
-    )
-    turbo = dspy.OpenAI(model=OPENAI_MODEL_NAME, api_key=openai_api_key, system_prompt=SYSTEM_PROMPT)
-
-    if USE_OLLAMA:
-        dspy.settings.configure(lm=ollama_lm)
+    # Configure the language model based on provider selection
+    if MODEL_PROVIDER == "ollama":
+        # Check if Ollama is available
+        try:
+            import requests
+            response = requests.get("http://localhost:11434/api/tags", timeout=5)
+            if response.status_code != 200:
+                raise ValueError("Ollama is not running. Please start Ollama first.")
+        except Exception as e:
+            raise ValueError(f"Ollama connection failed: {e}")
+        
+        lm = dspy.OllamaLocal(
+            model=OLLAMA_MODEL_NAME,
+            base_url="http://localhost:11434",
+            max_tokens=2048,
+            timeout_s=420
+        )
         print(f"Using Ollama model: {OLLAMA_MODEL_NAME}")
-    else:
-        dspy.settings.configure(lm=turbo)
+        
+    elif MODEL_PROVIDER == "openai":
+        # Check OpenAI API key
+        openai_api_key = os.getenv("OPENAI_API_KEY")
+        if not openai_api_key:
+            raise ValueError("OPENAI_API_KEY not found in .env file")
+        
+        lm = dspy.OpenAI(
+            model=OPENAI_MODEL_NAME, 
+            api_key=openai_api_key, 
+            system_prompt=SYSTEM_PROMPT
+        )
         print(f"Using OpenAI model: {OPENAI_MODEL_NAME}")
+        
+    elif MODEL_PROVIDER == "openrouter":
+        # Check OpenRouter API key
+        openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
+        if not openrouter_api_key:
+            raise ValueError("OPENROUTER_API_KEY not found in .env file")
+        
+        lm = dspy.LM(
+            model=OPENROUTER_MODEL_NAME,
+            api_base="https://openrouter.ai/api/v1",
+            api_key=openrouter_api_key,
+        )
+        print(f"Using OpenRouter model: {OPENROUTER_MODEL_NAME}")
+        
+    else:
+        raise ValueError(f"Invalid MODEL_PROVIDER: {MODEL_PROVIDER}. Must be one of: ollama, openai, openrouter")
+
+    # Configure DSPy with the selected language model
+    dspy.configure(lm=lm)
 
     # Use all training data for compilation
     train_data = load_train_data(TRAIN_FILE_PATH)
