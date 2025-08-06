@@ -119,32 +119,30 @@ BootstrapFewShot is a great starting point. For potentially better performance, 
 | **4th** | **GPT-OSS-20B** | **96.1%** | 20B | 17 errors | Efficient smaller model |
 | **5th** | **Gemma-2B** | **14%** | 2B | 43/50 errors | Poor performance |
 
-### gpt-4.1
+### openrouter/x-ai/grok-4
 
 ```
               precision    recall  f1-score   support
 
          Yes       1.00      0.98      0.99       197
-          No       0.99      1.00      0.99       242
+          No       0.98      1.00      0.99       242
 
-    accuracy                           0.99       439
+   micro avg       0.99      0.99      0.99       439
    macro avg       0.99      0.99      0.99       439
 weighted avg       0.99      0.99      0.99       439
 ```
 
-This demonstrates high accuracy and balanced performance for both classes.
-
-### gemma:2b
+### openrouter/qwen/qwen3-235b-a22b-2507
 
 ```
-             precision    recall  f1-score   support
+              precision    recall  f1-score   support
 
-         Yes       0.57      0.18      0.28        22
-          No       0.00      0.00      0.00        28
+         Yes       1.00      0.97      0.99       197
+          No       0.98      1.00      0.99       242
 
-   micro avg       0.57      0.08      0.14        50
-   macro avg       0.29      0.09      0.14        50
-weighted avg       0.25      0.08      0.12        50
+   micro avg       0.99      0.99      0.99       439
+   macro avg       0.99      0.99      0.99       439
+weighted avg       0.99      0.99      0.99       439
 ```
 
 ### openai/gpt-oss-120b
@@ -160,36 +158,6 @@ weighted avg       0.25      0.08      0.12        50
 weighted avg       0.97      0.96      0.97       439
 ```
 
-
-
-### openrouter/qwen/qwen3-235b-a22b-2507
-
-```
-              precision    recall  f1-score   support
-
-         Yes       1.00      0.97      0.99       197
-          No       0.98      1.00      0.99       242
-
-   micro avg       0.99      0.99      0.99       439
-   macro avg       0.99      0.99      0.99       439
-weighted avg       0.99      0.99      0.99       439
-```
-
-
-### openrouter/x-ai/grok-4
-
-```
-              precision    recall  f1-score   support
-
-         Yes       1.00      0.98      0.99       197
-          No       0.98      1.00      0.99       242
-
-   micro avg       0.99      0.99      0.99       439
-   macro avg       0.99      0.99      0.99       439
-weighted avg       0.99      0.99      0.99       439
-```
-
-
 ### openai/gpt-oss-20b
 
 ```
@@ -201,6 +169,32 @@ weighted avg       0.99      0.99      0.99       439
    micro avg       0.97      0.96      0.96       439
    macro avg       0.97      0.95      0.96       439
 weighted avg       0.97      0.96      0.96       439
+```
+
+### gemma:2b
+
+```
+             precision    recall  f1-score   support
+
+         Yes       0.57      0.18      0.28        22
+          No       0.00      0.00      0.00        28
+
+   micro avg       0.57      0.08      0.14        50
+   macro avg       0.29      0.09      0.14        50
+weighted avg       0.25      0.08      0.12        50
+```
+
+### gpt-4.1
+
+```
+              precision    recall  f1-score   support
+
+         Yes       1.00      0.98      0.99       197
+          No       0.99      1.00      0.99       242
+
+    accuracy                           0.99       439
+   macro avg       0.99      0.99      0.99       439
+weighted avg       0.99      0.99      0.99       439
 ```
 
 
