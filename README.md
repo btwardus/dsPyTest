@@ -119,7 +119,7 @@ BootstrapFewShot is a great starting point. For potentially better performance, 
 | **4th** | **GPT-OSS-20B** | **96.1%** | 20B | 17 errors | Efficient smaller model |
 | **5th** | **Gemma-2B** | **14%** | 2B | 43/50 errors | Poor performance |
 
-### Example Results: `gpt-4.1` 439 validation cases
+### gpt-4.1
 
 ```
               precision    recall  f1-score   support
@@ -134,7 +134,7 @@ weighted avg       0.99      0.99      0.99       439
 
 This demonstrates high accuracy and balanced performance for both classes.
 
-### Example Results: `gemma:2b` (Ollama, 50 validation cases)
+### gemma:2b
 
 ```
              precision    recall  f1-score   support
@@ -147,7 +147,7 @@ This demonstrates high accuracy and balanced performance for both classes.
 weighted avg       0.25      0.08      0.12        50
 ```
 
-### Example Results: `openai/gpt-oss-120b` (OpenRouter, 439 validation cases)
+### openai/gpt-oss-120b
 
 ```
               precision    recall  f1-score   support
@@ -160,24 +160,9 @@ weighted avg       0.25      0.08      0.12        50
 weighted avg       0.97      0.96      0.97       439
 ```
 
-**Performance Summary:**
-- **Overall Accuracy**: 96.1% (422/439 correct predictions)
-- **Training Examples**: 20 (tailored dataset)
-- **Model**: 120-billion parameter model via OpenRouter
-- **Confidence Levels**: High confidence scores (90-100%) for most predictions
 
-**Error Analysis:**
-- **17 Total Errors**: 12 false negatives, 5 unknown predictions
-- **0 False Positives**: Model is conservative, avoiding false positive errors
-- **Common Error Patterns**: Model number variations, missing information, color differences
 
-**Key Insights:**
-- Excellent performance with minimal training data (20 examples)
-- Conservative prediction strategy (prioritizes avoiding false positives)
-- High confidence scores indicate model certainty
-- Robust handling of product variations and missing information
-
-### Example Results: `openrouter/qwen/qwen3-235b-a22b-2507` (OpenRouter, 439 validation cases)
+### openrouter/qwen/qwen3-235b-a22b-2507
 
 ```
               precision    recall  f1-score   support
@@ -190,25 +175,8 @@ weighted avg       0.97      0.96      0.97       439
 weighted avg       0.99      0.99      0.99       439
 ```
 
-**Performance Summary:**
-- **Overall Accuracy**: 99.0% (434/439 correct predictions) ⭐
-- **Training Examples**: 20 (tailored dataset)
-- **Model**: 235-billion parameter model via OpenRouter
-- **Confidence Levels**: High confidence scores (90-100%) for most predictions
 
-**Error Analysis:**
-- **5 Total Errors**: All false negatives (predicted "No" when true was "Yes")
-- **0 False Positives**: Model is conservative, avoiding false positive errors
-- **Error Patterns**: Subtle differences in model numbers, series names, incomplete descriptions
-
-**Key Insights:**
-- **Best performing model** in our evaluation
-- Conservative prediction strategy (prioritizes avoiding false positives)
-- Detailed step-by-step reasoning for all decisions
-- Robust handling of edge cases and product variations
-- Exceptional performance with minimal training data (20 examples)
-
-### Example Results: `openrouter/x-ai/grok-4` (OpenRouter, 439 validation cases)
+### openrouter/x-ai/grok-4
 
 ```
               precision    recall  f1-score   support
@@ -221,26 +189,8 @@ weighted avg       0.99      0.99      0.99       439
 weighted avg       0.99      0.99      0.99       439
 ```
 
-**Performance Summary:**
-- **Overall Accuracy**: 99.1% (435/439 correct predictions) ⭐
-- **Training Examples**: 20 (tailored dataset)
-- **Model**: xAI Grok-4 model via OpenRouter
-- **Confidence Levels**: High confidence scores (90-100%) for most predictions, with some 0% confidence cases still being correct
 
-**Error Analysis:**
-- **4 Total Errors**: All false negatives (predicted "No" when true was "Yes")
-- **0 False Positives**: Model is conservative, avoiding false positive errors
-- **Error Patterns**: Different manufacturers (Canon vs SimpleTech), generic vs specific product descriptions, model number variations
-
-**Key Insights:**
-- **Second best performing model** in our evaluation
-- Conservative prediction strategy (prioritizes avoiding false positives)
-- Detailed step-by-step reasoning for all decisions
-- Interesting confidence pattern: some correct predictions had 0% confidence
-- Robust handling of edge cases and incomplete product descriptions
-- Exceptional performance with minimal training data (20 examples)
-
-### Example Results: `openai/gpt-oss-20b` (OpenRouter, 439 validation cases)
+### openai/gpt-oss-20b
 
 ```
               precision    recall  f1-score   support
@@ -253,25 +203,6 @@ weighted avg       0.99      0.99      0.99       439
 weighted avg       0.97      0.96      0.96       439
 ```
 
-**Performance Summary:**
-- **Overall Accuracy**: 96.1% (422/439 correct predictions)
-- **Training Examples**: 20 (tailored dataset)
-- **Model**: 20-billion parameter model via OpenRouter
-- **Confidence Levels**: High confidence scores (90-100%) for most predictions, with some 5% confidence cases and "Unknown" responses
-
-**Error Analysis:**
-- **17 Total Errors**: 14 false negatives, 3 "Unknown" predictions
-- **0 False Positives**: Model is conservative, avoiding false positive errors
-- **Error Patterns**: Model number variations, different manufacturers, generic vs specific descriptions, color differences
-
-**Key Insights:**
-- **Third best performing model** in our evaluation
-- Conservative prediction strategy (prioritizes avoiding false positives)
-- Detailed step-by-step reasoning for all decisions
-- Some responses truncated due to max_tokens limit
-- Occasional "Unknown" responses for ambiguous cases
-- Robust handling of edge cases and incomplete product descriptions
-- Good performance with smaller model size (20B parameters)
 
 ## References
 - [Abt-Buy Dataset and Benchmark](https://dbs.uni-leipzig.de/research/projects/benchmark-datasets-for-entity-resolution#:~:text=Used%20in-,Abt%2DBuy,-E%2Dcommerce)
