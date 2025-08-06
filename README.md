@@ -198,6 +198,71 @@ weighted avg       0.99      0.99      0.99       439
 - Robust handling of edge cases and product variations
 - Exceptional performance with minimal training data (20 examples)
 
+### Example Results: `openrouter/x-ai/grok-4` (OpenRouter, 439 validation cases)
+
+```
+              precision    recall  f1-score   support
+
+         Yes       1.00      0.98      0.99       197
+          No       0.98      1.00      0.99       242
+
+   micro avg       0.99      0.99      0.99       439
+   macro avg       0.99      0.99      0.99       439
+weighted avg       0.99      0.99      0.99       439
+```
+
+**Performance Summary:**
+- **Overall Accuracy**: 99.1% (435/439 correct predictions) ⭐
+- **Training Examples**: 20 (tailored dataset)
+- **Model**: xAI Grok-4 model via OpenRouter
+- **Confidence Levels**: High confidence scores (90-100%) for most predictions, with some 0% confidence cases still being correct
+
+**Error Analysis:**
+- **4 Total Errors**: All false negatives (predicted "No" when true was "Yes")
+- **0 False Positives**: Model is conservative, avoiding false positive errors
+- **Error Patterns**: Different manufacturers (Canon vs SimpleTech), generic vs specific product descriptions, model number variations
+
+**Key Insights:**
+- **Second best performing model** in our evaluation
+- Conservative prediction strategy (prioritizes avoiding false positives)
+- Detailed step-by-step reasoning for all decisions
+- Interesting confidence pattern: some correct predictions had 0% confidence
+- Robust handling of edge cases and incomplete product descriptions
+- Exceptional performance with minimal training data (20 examples)
+
+### Example Results: `openai/gpt-oss-20b` (OpenRouter, 439 validation cases)
+
+```
+              precision    recall  f1-score   support
+
+         Yes       1.00      0.91      0.95       197
+          No       0.94      0.99      0.97       242
+
+   micro avg       0.97      0.96      0.96       439
+   macro avg       0.97      0.95      0.96       439
+weighted avg       0.97      0.96      0.96       439
+```
+
+**Performance Summary:**
+- **Overall Accuracy**: 96.1% (422/439 correct predictions)
+- **Training Examples**: 20 (tailored dataset)
+- **Model**: 20-billion parameter model via OpenRouter
+- **Confidence Levels**: High confidence scores (90-100%) for most predictions, with some 5% confidence cases and "Unknown" responses
+
+**Error Analysis:**
+- **17 Total Errors**: 14 false negatives, 3 "Unknown" predictions
+- **0 False Positives**: Model is conservative, avoiding false positive errors
+- **Error Patterns**: Model number variations, different manufacturers, generic vs specific descriptions, color differences
+
+**Key Insights:**
+- **Third best performing model** in our evaluation
+- Conservative prediction strategy (prioritizes avoiding false positives)
+- Detailed step-by-step reasoning for all decisions
+- Some responses truncated due to max_tokens limit
+- Occasional "Unknown" responses for ambiguous cases
+- Robust handling of edge cases and incomplete product descriptions
+- Good performance with smaller model size (20B parameters)
+
 ## References
 - [Abt-Buy Dataset and Benchmark](https://dbs.uni-leipzig.de/research/projects/benchmark-datasets-for-entity-resolution#:~:text=Used%20in-,Abt%2DBuy,-E%2Dcommerce)
 - [DSPy: Modular LLM Pipelines](https://github.com/stanfordnlp/dspy)
