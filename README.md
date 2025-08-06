@@ -167,6 +167,37 @@ weighted avg       0.97      0.96      0.97       439
 - High confidence scores indicate model certainty
 - Robust handling of product variations and missing information
 
+### Example Results: `openrouter/qwen/qwen3-235b-a22b-2507` (OpenRouter, 439 validation cases)
+
+```
+              precision    recall  f1-score   support
+
+         Yes       1.00      0.97      0.99       197
+          No       0.98      1.00      0.99       242
+
+   micro avg       0.99      0.99      0.99       439
+   macro avg       0.99      0.99      0.99       439
+weighted avg       0.99      0.99      0.99       439
+```
+
+**Performance Summary:**
+- **Overall Accuracy**: 99.0% (434/439 correct predictions) ⭐
+- **Training Examples**: 20 (tailored dataset)
+- **Model**: 235-billion parameter model via OpenRouter
+- **Confidence Levels**: High confidence scores (90-100%) for most predictions
+
+**Error Analysis:**
+- **5 Total Errors**: All false negatives (predicted "No" when true was "Yes")
+- **0 False Positives**: Model is conservative, avoiding false positive errors
+- **Error Patterns**: Subtle differences in model numbers, series names, incomplete descriptions
+
+**Key Insights:**
+- **Best performing model** in our evaluation
+- Conservative prediction strategy (prioritizes avoiding false positives)
+- Detailed step-by-step reasoning for all decisions
+- Robust handling of edge cases and product variations
+- Exceptional performance with minimal training data (20 examples)
+
 ## References
 - [Abt-Buy Dataset and Benchmark](https://dbs.uni-leipzig.de/research/projects/benchmark-datasets-for-entity-resolution#:~:text=Used%20in-,Abt%2DBuy,-E%2Dcommerce)
 - [DSPy: Modular LLM Pipelines](https://github.com/stanfordnlp/dspy)
