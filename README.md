@@ -109,6 +109,16 @@ BootstrapFewShot is a great starting point. For potentially better performance, 
 
 ## Results Overview
 
+### 🏆 Model Performance Rankings
+
+| Rank | Model | Accuracy | Parameters | Errors | Key Characteristics |
+|------|-------|----------|------------|--------|-------------------|
+| **🥇 1st** | **Grok-4** | **99.1%** | Unknown | 4 errors | Best overall performance |
+| **🥈 2nd** | **Qwen 3-235B** | **99.0%** | 235B | 5 errors | Largest model, excellent reasoning |
+| **🥉 3rd** | **GPT-OSS-120B** | **96.1%** | 120B | 17 errors | Good balance of performance/size |
+| **4th** | **GPT-OSS-20B** | **96.1%** | 20B | 17 errors | Efficient smaller model |
+| **5th** | **Gemma-2B** | **14%** | 2B | 43/50 errors | Poor performance |
+
 ### Example Results: `gpt-4.1` 439 validation cases
 
 ```
