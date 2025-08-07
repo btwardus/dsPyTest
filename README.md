@@ -113,11 +113,12 @@ BootstrapFewShot is a great starting point. For potentially better performance, 
 
 | Rank | Model | Accuracy | Parameters | Errors | Key Characteristics |
 |------|-------|----------|------------|--------|-------------------|
-| **🥇 1st** | **Grok-4** | **99.1%** | Unknown | 4 errors | Best overall performance |
-| **🥈 2nd** | **Qwen 3-235B** | **99.0%** | 235B | 5 errors | Largest model, excellent reasoning |
-| **🥉 3rd** | **GPT-OSS-120B** | **96.1%** | 120B | 17 errors | Good balance of performance/size |
-| **4th** | **GPT-OSS-20B** | **96.1%** | 20B | 17 errors | Efficient smaller model |
-| **5th** | **Gemma-2B** | **14%** | 2B | 43/50 errors | Poor performance |
+| **🥇 1st** | **Codestral-2508** | **99.3%** | Unknown | 3 errors | Best overall performance |
+| **🥈 2nd** | **Grok-4** | **99.1%** | Unknown | 4 errors | Excellent reasoning |
+| **🥉 3rd** | **Qwen 3-235B** | **99.0%** | 235B | 5 errors | Largest model, excellent reasoning |
+| **4th** | **GPT-OSS-120B** | **96.1%** | 120B | 17 errors | Good balance of performance/size |
+| **5th** | **GPT-OSS-20B** | **96.1%** | 20B | 17 errors | Efficient smaller model |
+| **6th** | **Gemma-2B** | **14%** | 2B | 43/50 errors | Poor performance |
 
 ### openrouter/x-ai/grok-4
 

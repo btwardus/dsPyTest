@@ -25,7 +25,7 @@ OLLAMA_MODEL_NAME = 'qwen3:14b'  # Name of the Ollama model to use
 OPENAI_MODEL_NAME = 'gpt-4.1'  # Name of the openai model to use
 
 # OpenRouter Configuration
-OPENROUTER_MODEL_NAME = 'openai/gpt-oss-20b'  # Name of the OpenRouter model to use
+OPENROUTER_MODEL_NAME = 'openrouter/mistralai/codestral-2508'  # Name of the OpenRouter model to use
 SYSTEM_PROMPT = (
     "You are an entity resolution assistant. For each product pair, output only 'Yes' or 'No' as the label, and nothing else as the first line. "
     "Then, provide a short, step-by-step explanation of your reasoning as the next field. "
@@ -33,8 +33,8 @@ SYSTEM_PROMPT = (
 )  # System prompt for the language model
 TRAIN_FILE_PATH = 'data/train_products_tailored.csv'  # Path to the training CSV file
 VALIDATION_FILE_PATH = 'data/val_products.csv'  # Path to the validation CSV file
-VALIDATION_SAMPLE_SIZE = 500  # Number of validation examples to sample
-MAX_WORKERS = 8  # Number of threads for parallel evaluation
+VALIDATION_SAMPLE_SIZE = 10  # Number of validation examples to sample (start small)
+MAX_WORKERS = 2  # Number of threads for parallel evaluation
 MAX_BOOTSTRAPPED_DEMOS = 1  # Number of bootstrapped demos for BootstrapFewShot
 # =====================
 
